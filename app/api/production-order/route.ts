@@ -122,9 +122,8 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json(deletedProductionOrder, { status: 200 });
   } catch (error: any) {
-    console.error("Error deleting production order:", error);
     return NextResponse.json(
-      { error: "Failed to delete production order", message: error.message },
+      { error: "Failed to delete production order", message: error },
       { status: 500 }
     );
   }

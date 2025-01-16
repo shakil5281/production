@@ -21,7 +21,7 @@ export async function GET() {
     ];
 
     // Add data
-    reports.forEach((report) => {
+    reports.forEach((report:any) => {
       worksheet.addRow({
         date: report.date.toISOString().split('T')[0],
         workerId: report.workerId,

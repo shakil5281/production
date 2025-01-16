@@ -24,7 +24,7 @@ export async function GET() {
     doc.text('Quantity');
 
     // Add data rows
-    reports.forEach((report) => {
+    reports.forEach((report:any) => {
       doc.text(report.date.toISOString().split('T')[0], { continued: true, width: 100 });
       doc.text(report.workerId, { continued: true, width: 100 });
       doc.text(report.productName, { continued: true, width: 150 });
