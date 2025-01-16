@@ -77,8 +77,8 @@ export default function ProductionOrder() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {orders.map((order) => (
-                                    <TableRow key={order.id}>
+                                {orders.map((order:any, index:number) => (
+                                    <TableRow key={index}>
                                         <TableCell>{order.programCode}</TableCell>
                                         <TableCell>{order.buyer}</TableCell>
                                         <TableCell>{order.item}</TableCell>
