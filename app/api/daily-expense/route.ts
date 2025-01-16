@@ -3,103 +3,68 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Expense rates
 const RATES = {
-  operatorGeneral: 487,
-  operatorOvertime: 80,
-  helperGeneral: 355,
-  helperOvertime: 57,
-  cuttingGeneral: 410,
-  cuttingOvertime: 66,
-  finishingGeneral: 420,
-  finishingOvertime: 69,
-  qualityGeneral: 410,
-  qualityOvertime: 66,
-  staff: 500, // Example rate for staff
+  operatorGeneral: 100, // Example rate
+  operatorOvertime: 150,
+  helperGeneral: 80,
+  helperOvertime: 120,
+  cuttingGeneral: 90,
+  cuttingOvertime: 130,
+  finishingGeneral: 110,
+  finishingOvertime: 140,
+  qualityGeneral: 95,
+  qualityOvertime: 125,
+  staff: 70,
 };
 
 export async function POST(request: Request) {
+  const body = await request.json();
   try {
-    const body = await request.json();
+    // Calculate individual expenses
+    const operatorExpense = body.operatorGeneral * RATES.operatorGeneral +
+      body.operatorOvertime * RATES.operatorOvertime;
 
-    // Validate input
-    if (!body.date) {
-      return NextResponse.json({ error: 'Date is required' }, { status: 400 });
-    }
+    const helperExpense = body.helperGeneral * RATES.helperGeneral +
+      body.helperOvertime * RATES.helperOvertime;
 
-    // Extract values from the request body
-    const {
-      operatorGeneral = 0,
-      operatorOvertime = 0,
-      helperGeneral = 0,
-      helperOvertime = 0,
-      cuttingGeneral = 0,
-      cuttingOvertime = 0,
-      finishingGeneral = 0,
-      finishingOvertime = 0,
-      qualityGeneral = 0,
-      qualityOvertime = 0,
-      staff = 0,
-    } = body;
+    const cuttingExpense = body.cuttingGeneral * RATES.cuttingGeneral +
+      body.cuttingOvertime * RATES.cuttingOvertime;
 
-    // Calculate total expense
-    const totalExpense =
-      operatorGeneral * RATES.operatorGeneral +
-      operatorOvertime * RATES.operatorOvertime +
-      helperGeneral * RATES.helperGeneral +
-      helperOvertime * RATES.helperOvertime +
-      cuttingGeneral * RATES.cuttingGeneral +
-      cuttingOvertime * RATES.cuttingOvertime +
-      finishingGeneral * RATES.finishingGeneral +
-      finishingOvertime * RATES.finishingOvertime +
-      qualityGeneral * RATES.qualityGeneral +
-      qualityOvertime * RATES.qualityOvertime +
-      staff * RATES.staff;
+    const finishingExpense = body.finishingGeneral * RATES.finishingGeneral +
+      body.finishingOvertime * RATES.finishingOvertime;
 
-    // Create or update daily expense record
-    const dailyExpense = await prisma.dailyExpense.upsert({
-      where: { date: new Date(body.date) },
-      update: {
-        operatorGeneral,
-        operatorOvertime,
-        helperGeneral,
-        helperOvertime,
-        cuttingGeneral,
-        cuttingOvertime,
-        finishingGeneral,
-        finishingOvertime,
-        qualityGeneral,
-        qualityOvertime,
-        staff,
-        totalExpense,
-      },
-      create: {
+    const qualityExpense = body.qualityGeneral * RATES.qualityGeneral +
+      body.qualityOvertime * RATES.qualityOvertime;
+
+    const staffExpense = body.staff * RATES.staff;
+
+    // Sum total expenses
+    const totalExpense = operatorExpense + helperExpense + cuttingExpense +
+      finishingExpense + qualityExpense + staffExpense;
+
+    // Create the daily expense entry
+    const dailyExpense = await prisma.dailyExpense.create({
+      data: {
         date: new Date(body.date),
-        operatorGeneral,
-        operatorOvertime,
-        helperGeneral,
-        helperOvertime,
-        cuttingGeneral,
-        cuttingOvertime,
-        finishingGeneral,
-        finishingOvertime,
-        qualityGeneral,
-        qualityOvertime,
-        staff,
-        totalExpense,
+        operatorGeneral: body.operatorGeneral,
+        operatorOvertime: body.operatorOvertime,
+        helperGeneral: body.helperGeneral,
+        helperOvertime: body.helperOvertime,
+        cuttingGeneral: body.cuttingGeneral,
+        cuttingOvertime: body.cuttingOvertime,
+        finishingGeneral: body.finishingGeneral,
+        finishingOvertime: body.finishingOvertime,
+        qualityGeneral: body.qualityGeneral,
+        qualityOvertime: body.qualityOvertime,
+        staff: body.staff,
+        totalExpense: totalExpense, // Use calculated totalExpense
       },
     });
-
     return NextResponse.json(dailyExpense, { status: 201 });
-  } catch (error) {
-    console.error('Error creating daily expense:', error);
-    return NextResponse.json({ error: 'Failed to create daily expense' }, { status: 500 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Failed to create daily expense' }, { status: 500 });
   }
 }
-
-
-
-
 
 export async function GET() {
   try {
@@ -112,4 +77,70 @@ export async function GET() {
     console.error('Error fetching daily expenses:', error);
     return NextResponse.json({ error: 'Failed to fetch daily expenses' }, { status: 500 });
   }
+}
+
+export async function PUT(request: Request) {
+  const body = await request.json();
+  const { id } = body; // Assuming the expense ID is passed in the body
+  try {
+    // Update the daily expense entry
+    const updatedExpense = await prisma.dailyExpense.update({
+      where: { id: id },
+      data: {
+        date: new Date(body.date),
+        operatorGeneral: body.operatorGeneral,
+        operatorOvertime: body.operatorOvertime,
+        helperGeneral: body.helperGeneral,
+        helperOvertime: body.helperOvertime,
+        cuttingGeneral: body.cuttingGeneral,
+        cuttingOvertime: body.cuttingOvertime,
+        finishingGeneral: body.finishingGeneral,
+        finishingOvertime: body.finishingOvertime,
+        qualityGeneral: body.qualityGeneral,
+        qualityOvertime: body.qualityOvertime,
+        staff: body.staff,
+        // Recalculate totalExpense if necessary
+        totalExpense: calculateTotalExpense(body),
+      },
+    });
+    return NextResponse.json(updatedExpense, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Failed to update daily expense' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  const { id } = await request.json(); // Assuming the expense ID is passed in the body
+  try {
+    // Delete the daily expense entry
+    await prisma.dailyExpense.delete({
+      where: { id: id },
+    });
+    return NextResponse.json({ message: 'Daily expense deleted successfully' }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Failed to delete daily expense' }, { status: 500 });
+  }
+}
+
+// Helper function to calculate total expense
+function calculateTotalExpense(body: any) {
+  const operatorExpense = body.operatorGeneral * RATES.operatorGeneral +
+    body.operatorOvertime * RATES.operatorOvertime;
+
+  const helperExpense = body.helperGeneral * RATES.helperGeneral +
+    body.helperOvertime * RATES.helperOvertime;
+
+  const cuttingExpense = body.cuttingGeneral * RATES.cuttingGeneral +
+    body.cuttingOvertime * RATES.cuttingOvertime;
+
+  const finishingExpense = body.finishingGeneral * RATES.finishingGeneral +
+    body.finishingOvertime * RATES.finishingOvertime;
+
+  const qualityExpense = body.qualityGeneral * RATES.qualityGeneral +
+    body.qualityOvertime * RATES.qualityOvertime;
+
+  const staffExpense = body.staff * RATES.staff;
+
+  return operatorExpense + helperExpense + cuttingExpense +
+    finishingExpense + qualityExpense + staffExpense;
 }
