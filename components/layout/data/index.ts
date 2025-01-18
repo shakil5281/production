@@ -41,7 +41,7 @@ export const data = {
       title: "Dashboard",
       url: "#",
       icon: SquareTerminal,
-      isActive: true,
+      isActive: false,
       items: [
         {
           title: "Attendance",
@@ -61,11 +61,10 @@ export const data = {
       title: "Attendance",
       url: "#",
       icon: SquareTerminal,
-      isActive: true,
       items: [
         {
-          title: "Attendance",
-          url: "#",
+          title: "Create Attendance",
+          url: "/create-attendance",
         },
         {
           title: "Starred",
@@ -87,8 +86,8 @@ export const data = {
           url: "/order-list",
         },
         {
-          title: "Explorer",
-          url: "#",
+          title: "Create Order",
+          url: "/create-order",
         },
         {
           title: "Quantum",
@@ -102,8 +101,8 @@ export const data = {
       icon: BookOpen,
       items: [
         {
-          title: "Order List",
-          url: "/order-list",
+          title: "Production Report",
+          url: "/production-report",
         },
         {
           title: "Get Started",
