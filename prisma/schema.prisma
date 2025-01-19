@@ -30,12 +30,52 @@ model DailyExpense {
   qualityGeneral    Int      @default(0)
   qualityOvertime   Int      @default(0)
   staff             Int      @default(0)
+  cleaner           Int      @default(0)
+  loader            Int      @default(0)
+  ironInput         Int      @default(0)
   totalExpense      Float    @default(0.0)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
 
-// schema.prisma
+model DailyExpenseRate {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  date      DateTime @default(now()) @unique
+  operatorGeneral   Int      @default(0)
+  operatorOvertime  Int      @default(0)
+  helperGeneral     Int      @default(0)
+  helperOvertime    Int      @default(0)
+  cuttingGeneral    Int      @default(0)
+  cuttingOvertime   Int      @default(0)
+  finishingGeneral  Int      @default(0)
+  finishingOvertime Int      @default(0)
+  qualityGeneral    Int      @default(0)
+  qualityOvertime   Int      @default(0)
+  staff             Int      @default(0)
+  cleaner           Int      @default(0)
+  loader            Int      @default(0)
+  ironInput         Int      @default(0)
+  totalExpense      Float    @default(0.0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Manpower
+model Manpower {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  date      DateTime @default(now()) @unique
+  operator  Int      @default(0)
+  helper    Int      @default(0)
+  cutting   Int      @default(0)
+  finishing Int      @default(0)
+  quality   Int      @default(0)
+  staff     Int      @default(0)
+  cleaner   Int      @default(0)
+  loader    Int      @default(0)
+  total     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
 // schema.prisma
 
