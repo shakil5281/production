@@ -67,12 +67,12 @@ export const data = {
           url: "/create-attendance",
         },
         {
-          title: "Starred",
-          url: "#",
+          title: "Manpower",
+          url: "/manpower",
         },
         {
-          title: "Settings",
-          url: "#",
+          title: "Manpower List",
+          url: "/manpower-list",
         },
       ],
     },
