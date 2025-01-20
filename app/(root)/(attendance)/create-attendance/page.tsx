@@ -32,6 +32,7 @@ const FormSchema = z.object({
     }),
     operator: z.number({ invalid_type_error: "Must be a number." }).min(0, { message: "Value must be at least 0." }),
     helper: z.number({ invalid_type_error: "Must be a number." }).min(0, { message: "Value must be at least 0." }),
+    ironInput: z.number({ invalid_type_error: "Must be a number." }).min(0, { message: "Value must be at least 0." }),
     cutting: z.number({ invalid_type_error: "Must be a number." }).min(0, { message: "Value must be at least 0." }),
     finishing: z.number({ invalid_type_error: "Must be a number." }).min(0, { message: "Value must be at least 0." }),
     quality: z.number({ invalid_type_error: "Must be a number." }).min(0, { message: "Value must be at least 0." }),
@@ -48,6 +49,7 @@ export default function AttendanceFormWithCalendar() {
             date: undefined,
             operator: 0,
             helper: 0,
+            ironInput: 0,
             cutting: 0,
             finishing: 0,
             quality: 0,
@@ -137,7 +139,7 @@ export default function AttendanceFormWithCalendar() {
                         )}
                     />
                     {/* Other fields */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Operator */}
                         <FormField
                             control={form.control}
@@ -149,7 +151,7 @@ export default function AttendanceFormWithCalendar() {
                                         <Input
                                             type="number"
                                             {...field}
-                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -167,14 +169,32 @@ export default function AttendanceFormWithCalendar() {
                                         <Input
                                             type="number"
                                             {...field}
-                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
                                         />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        {/* Cutting */}
+                        {/* Iron Input */}
+                        <FormField
+                            control={form.control}
+                            name="ironInput"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Iron/Input</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="number"
+                                            {...field}
+                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
                         <FormField
                             control={form.control}
                             name="cutting"
@@ -185,7 +205,7 @@ export default function AttendanceFormWithCalendar() {
                                         <Input
                                             type="number"
                                             {...field}
-                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -203,7 +223,7 @@ export default function AttendanceFormWithCalendar() {
                                         <Input
                                             type="number"
                                             {...field}
-                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -221,7 +241,7 @@ export default function AttendanceFormWithCalendar() {
                                         <Input
                                             type="number"
                                             {...field}
-                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -239,7 +259,7 @@ export default function AttendanceFormWithCalendar() {
                                         <Input
                                             type="number"
                                             {...field}
-                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -257,7 +277,7 @@ export default function AttendanceFormWithCalendar() {
                                         <Input
                                             type="number"
                                             {...field}
-                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -275,7 +295,7 @@ export default function AttendanceFormWithCalendar() {
                                         <Input
                                             type="number"
                                             {...field}
-                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
                                         />
                                     </FormControl>
                                     <FormMessage />

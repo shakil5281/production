@@ -71,8 +71,12 @@ export const data = {
           url: "/manpower",
         },
         {
-          title: "Manpower List",
-          url: "/manpower-list",
+          title: "Daily Over Time",
+          url: "/daily-ot",
+        },
+        {
+          title: "Daily Expense",
+          url: "/daily-expense",
         },
       ],
     },

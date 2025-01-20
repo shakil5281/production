@@ -39,8 +39,8 @@ model DailyExpense {
 }
 
 model DailyExpenseRate {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  date      DateTime @default(now()) @unique
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  date              DateTime @unique @default(now())
   operatorGeneral   Int      @default(0)
   operatorOvertime  Int      @default(0)
   helperGeneral     Int      @default(0)
@@ -63,13 +63,14 @@ model DailyExpenseRate {
 // Manpower
 model Manpower {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  date      DateTime @default(now()) @unique
+  date      DateTime @unique @default(now())
+  staff     Int      @default(0)
   operator  Int      @default(0)
   helper    Int      @default(0)
+  ironInput Int      @default(0)
   cutting   Int      @default(0)
   finishing Int      @default(0)
   quality   Int      @default(0)
-  staff     Int      @default(0)
   cleaner   Int      @default(0)
   loader    Int      @default(0)
   total     Int      @default(0)

@@ -39,6 +39,7 @@ export async function GET(req: Request) {
 const calculateTotal = (data: {
     operator?: number;
     helper?: number;
+    ironInput?: number;
     cutting?: number;
     finishing?: number;
     quality?: number;
@@ -49,6 +50,7 @@ const calculateTotal = (data: {
     return (
       (data.operator || 0) +
       (data.helper || 0) +
+      (data.ironInput || 0) +
       (data.cutting || 0) +
       (data.finishing || 0) +
       (data.quality || 0) +
@@ -72,6 +74,7 @@ export async function POST(req: Request) {
           date: body.date || new Date(),
           operator: body.operator || 0,
           helper: body.helper || 0,
+          ironInput: body.ironInput || 0,
           cutting: body.cutting || 0,
           finishing: body.finishing || 0,
           quality: body.quality || 0,
