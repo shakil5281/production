@@ -19,6 +19,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import TopBarProgress from "@/components/TopBarProgress";
 
 const roboto = localFont({
   src: "./fonts/Roboto-VariableFont_wdth,wght.ttf",
@@ -43,6 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${roboto.variable} antialiased font-[family-name:var(--font-geist-sans)]`} >
+      <TopBarProgress />
         <SidebarProvider>
           <AppSidebar />
           <SidebarInset>

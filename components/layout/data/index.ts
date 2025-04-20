@@ -109,8 +109,8 @@ export const data = {
           url: "/production-report",
         },
         {
-          title: "Get Started",
-          url: "#",
+          title: "Target",
+          url: "/target",
         },
         {
           title: "Tutorials",

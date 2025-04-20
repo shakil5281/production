@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
+import axiosInstance from "@/lib/axios"
 
 // Define validation schema
 const FormSchema = z.object({
@@ -40,7 +41,7 @@ const FormSchema = z.object({
   }),
   orderQty: z
     .number({ invalid_type_error: "Order Quantity must be a number." })
-    .min(1, { message: "Order Quantity must be greater than 0." }),
+    .min(0, { message: "Order Quantity must be greater than 0." }),
   percentage: z
     .number({ invalid_type_error: "Percentage must be a number." })
     .min(0, { message: "Percentage must be at least 0." })
@@ -69,15 +70,14 @@ export default function OrderForm() {
     },
   })
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-full rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    })
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    try {
+      const response = await axiosInstance.post('/production-order', data);
+      console.log(response.data);
+
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   return (
