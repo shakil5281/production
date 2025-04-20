@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster"
+
 
 
 import { AppSidebar } from "@/components/layout/app-sidebar"
@@ -19,6 +19,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { Toaster } from "sonner";
 
 const roboto = localFont({
   src: "./fonts/Roboto-VariableFont_wdth,wght.ttf",
@@ -69,7 +70,7 @@ export default function RootLayout({
               <main>
                 {children}
               </main>
-              <Toaster />
+              <Toaster richColors   />
             </div>
           </SidebarInset>
         </SidebarProvider>

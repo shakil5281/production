@@ -19,32 +19,13 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const {
-      programCode,
-      buyer,
-      item,
-      styleNo,
-      orderQty,
-      percentage,
-      unitPrice,
-      status,
-    } = body;
-
-    if (
-      !programCode ||
-      !buyer ||
-      !item ||
-      !styleNo ||
-      !orderQty ||
-      !percentage ||
-      !unitPrice ||
-      !status
-    ) {
-      return NextResponse.json({ error: "All fields are required" }, { status: 400 });
-    }
-
-    const newProductionOrder = await prisma.productionOrder.create({
-      data: {
+    const exitsStyle = await prisma.productionOrder.findUnique({
+      where: {
+        styleNo: body.styleNo
+      }
+    })
+    if (exitsStyle === null) {
+      const {
         programCode,
         buyer,
         item,
@@ -53,10 +34,40 @@ export async function POST(request: Request) {
         percentage,
         unitPrice,
         status,
-      },
-    });
+      } = body;
 
-    return NextResponse.json(newProductionOrder, { status: 201 });
+      if (
+        !programCode ||
+        !buyer ||
+        !item ||
+        !styleNo ||
+        !orderQty ||
+        !percentage ||
+        !unitPrice ||
+        !status
+      ) {
+        return NextResponse.json({ error: "All fields are required" }, { status: 400 });
+      }
+
+      const newProductionOrder = await prisma.productionOrder.create({
+        data: {
+          programCode,
+          buyer,
+          item,
+          styleNo,
+          orderQty,
+          percentage,
+          unitPrice,
+          status,
+        },
+      });
+
+      return NextResponse.json(newProductionOrder, { status: 201 });
+    } else {
+      return NextResponse.json({ message: 'Style no already exits' }, { status: 403 })
+    }
+
+
   } catch (error: any) {
     return NextResponse.json({ error: "Failed to create production order", message: error }, { status: 500 });
   }

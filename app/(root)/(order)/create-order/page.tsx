@@ -22,7 +22,10 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useToast } from "@/hooks/use-toast"
+import axiosInstance from "@/lib/axios"
+import { toast } from "sonner"
+
+
 
 // Define validation schema
 const FormSchema = z.object({
@@ -54,7 +57,6 @@ const FormSchema = z.object({
 })
 
 export default function OrderForm() {
-  const { toast } = useToast()
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -69,16 +71,29 @@ export default function OrderForm() {
     },
   })
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-full rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    })
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    try {
+      const response = await axiosInstance.post("/production-order", data)
+      toast.success("Order create successful")
+      form.reset()
+    } catch (err: any) {
+      if (err?.response?.status === 403) {
+        toast.warning(err.response.data?.message || "You are not authorized.")
+
+        // 👉 Focus styleNo input
+        form.setFocus("styleNo")
+
+        // 👉 Set warning/error on styleNo field
+        form.setError("styleNo", {
+          type: "manual",
+          message: "You are not allowed to create this order with this Style No.",
+        })
+      } else {
+        toast.error("Order create failed")
+      }
+    }
   }
+
 
   return (
     <div>
