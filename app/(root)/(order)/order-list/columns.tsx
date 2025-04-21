@@ -2,7 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,16 +11,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ArrowUpDown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
 export type Payment = {
   id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
+  programCode: string;
+  buyer: string;
+  item: string;
+  styleNo: string;
+  orderQty: number;
+  percentage: number;
+  unitPrice: number;
+  status: string;
+  createdAt: string;
 };
 
 export const columns: ColumnDef<Payment>[] = [
@@ -47,37 +50,68 @@ export const columns: ColumnDef<Payment>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    accessorKey: "status",
-    header: "Status",
-  },
-  {
-    accessorKey: "email",
-    header: ({ column }) => {
+  { accessorKey: "programCode", header: "Program Code" },
+  { accessorKey: "buyer", header: "Buyer" },
+  { accessorKey: "item", header: "Item" },
+  { 
+    accessorKey: "styleNo",
+     header: "Style No",
+     cell: ({ row }) => {
+      const styleNo = row.getValue("styleNo") as string;
+  
+      const statusColor = {
+        pending: "bg-yellow-100 text-yellow-800",
+        approved: "bg-green-100 text-green-800",
+        rejected: "bg-red-100 text-red-800",
+      };
+  
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        <span
+          className="text-red-600"
         >
-          Email
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+          {styleNo}
+        </span>
       );
     },
   },
+  { accessorKey: "orderQty", header: "Order Qty" },
   {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
+    accessorKey: "percentage",
+    header: "Percentage",
+    cell: ({ row }) => `${row.getValue("percentage")}%`,
+  },
+  {
+    accessorKey: "unitPrice",
+    header: "Unit Price",
+    cell: ({ row }) => `$${row.getValue("unitPrice")}`,
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-
-      return <div className="text-right font-medium">{formatted}</div>;
+      const status = row.getValue("status") as string;
+  
+      const statusColor = {
+        pending: "bg-yellow-100 text-yellow-800",
+        approved: "bg-green-100 text-green-800",
+        rejected: "bg-red-100 text-red-800",
+      };
+  
+      return (
+        <Badge
+          variant='secondary'
+        >
+          {status}
+        </Badge>
+      );
     },
   },
+  // {
+  //   accessorKey: "createdAt",
+  //   header: "Created At",
+  //   cell: ({ row }) =>
+  //     new Date(row.getValue("createdAt")).toLocaleDateString("en-GB"),
+  // },
   {
     id: "actions",
     cell: ({ row }) => {
@@ -96,11 +130,10 @@ export const columns: ColumnDef<Payment>[] = [
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(payment.id)}
             >
-              Copy payment ID
+              Copy ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem>View Details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
