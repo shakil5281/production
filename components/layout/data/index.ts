@@ -90,6 +90,10 @@ export const data = {
           url: "/order-list",
         },
         {
+          title: "Running Order list",
+          url: "/running",
+        },
+        {
           title: "Create Order",
           url: "/create-order",
         },

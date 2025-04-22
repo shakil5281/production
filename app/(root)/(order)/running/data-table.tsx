@@ -66,7 +66,7 @@ export function DataTable<TData, TValue>({
 
   // ✅ Set initial page size to 5
   React.useEffect(() => {
-    table.setPageSize(10);
+    table.setPageSize(5);
   }, [table]);
 
   return (

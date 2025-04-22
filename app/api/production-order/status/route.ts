@@ -31,3 +31,33 @@ export async function GET(request: Request) {
     );
   }
 }
+
+
+export async function PATCH(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, newStatus } = body;
+
+    // Validate inputs
+    if (!id || !newStatus) {
+      return NextResponse.json(
+        { error: "Both 'id' and 'newStatus' are required." },
+        { status: 400 }
+      );
+    }
+
+    // Update status in DB
+    const updatedOrder = await prisma.productionOrder.update({
+      where: { id },
+      data: { status: newStatus },
+    });
+
+    return NextResponse.json(updatedOrder, { status: 200 });
+  } catch (error: any) {
+    console.error("Error updating production order status:", error);
+    return NextResponse.json(
+      { error: "Failed to update production order status", message: error.message },
+      { status: 500 }
+    );
+  }
+}
