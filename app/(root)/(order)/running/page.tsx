@@ -13,7 +13,7 @@ export default function ClientPosts() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await axiosInstance.get<any[]>("/production-order");
+        const res = await axiosInstance.get<any[]>("/production-order/status?status=IN_PROGRESS");
         setPosts(res.data); // ✅ Don't slice, let TanStack handle pagination
       } catch (err) {
         setError("Failed to fetch posts.");
@@ -30,7 +30,7 @@ export default function ClientPosts() {
 
   return (
     <div className="container mx-auto py-10">
-      <h2 className="text-2xl font-semibold">All Order list</h2>
+      <h2 className="text-2xl font-semibold">Running Order list</h2>
       <DataTable columns={columns} data={posts} />
     </div>
   );

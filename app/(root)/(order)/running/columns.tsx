@@ -91,49 +91,21 @@ export const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
   
-      let badgeVariant: "default" | "success" | "destructive" | "secondary" = "default";
-      let textColorClass = "";
-      let bgColorClass = "";
-  
-      switch (status) {
-        case "PENDING":
-          badgeVariant = "secondary";
-          bgColorClass = "bg-yellow-100";
-          textColorClass = "text-yellow-800";
-          break;
-        case "IN_PROGRESS":
-          badgeVariant = "default";
-          bgColorClass = "bg-blue-100 hover:bg-blue-50";
-          textColorClass = "text-blue-800";
-          break;
-        case "COMPLETED":
-          badgeVariant = "success";
-          bgColorClass = "bg-green-100";
-          textColorClass = "text-green-800";
-          break;
-        case "CANCELLED":
-          badgeVariant = "destructive";
-          bgColorClass = "bg-red-100";
-          textColorClass = "text-red-800";
-          break;
-        default:
-          badgeVariant = "default";
-          bgColorClass = "bg-gray-100";
-          textColorClass = "text-gray-800";
-          break;
-      }
+      const statusColor = {
+        pending: "bg-yellow-100 text-yellow-800",
+        approved: "bg-green-100 text-green-800",
+        rejected: "bg-red-100 text-red-800",
+      };
   
       return (
         <Badge
-          className={`${bgColorClass} ${textColorClass}`}
-          variant={badgeVariant}
+          variant='secondary'
         >
           {status}
         </Badge>
       );
     },
   },
-  
   // {
   //   accessorKey: "createdAt",
   //   header: "Created At",
