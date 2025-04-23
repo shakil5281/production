@@ -44,17 +44,21 @@ export const data = {
       isActive: false,
       items: [
         {
-          title: "Attendance",
-          url: "#",
+          title: "Home",
+          url: "/",
         },
         {
-          title: "Starred",
-          url: "#",
+          title: "Monthly Report",
+          url: "/report",
         },
         {
-          title: "Settings",
-          url: "#",
+          title: "Task",
+          url: "/task",
         },
+        {
+          title: "Users",
+          url: '/users'
+        }
       ],
     },
     {
@@ -96,11 +100,7 @@ export const data = {
         {
           title: "Create Order",
           url: "/create-order",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
+        }
       ],
     },
     {
@@ -113,8 +113,8 @@ export const data = {
           url: "/production-report",
         },
         {
-          title: "Get Started",
-          url: "#",
+          title: "Daily Target",
+          url: "/daily-target",
         },
         {
           title: "Tutorials",
