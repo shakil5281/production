@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -23,6 +24,17 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
+import { CalendarIcon } from "lucide-react"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
+import axios from "axios"
+import axiosInstance from "@/lib/axios"
 
 // Define the schema
 const FormSchema = z.object({
@@ -30,6 +42,9 @@ const FormSchema = z.object({
   productionOrderId: z.string().nonempty("Production Order ID is required."),
   dailyProduction: z.number({ invalid_type_error: "Daily Production must be a number." }).min(1, {
     message: "Daily Production must be greater than 0.",
+  }),
+  date: z.date({
+    required_error: "A date of birth is required.",
   }),
 })
 
@@ -63,23 +78,81 @@ export default function ProductionReportForm() {
   }, [])
 
   // Handle form submission
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    setEntries((prev:any) => [...prev, data])
-    toast({
-      title: "Entry Added",
-      description: "Your production report has been added successfully.",
-    })
-    form.reset()
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    try {
+      await axiosInstance.post('/production-report', data)
+      DailyProductionReport()
+      form.reset()
+    } catch (err) {
+      console.log(err)
+    }
   }
+
+  const DailyProductionReport = async () => {
+    try {
+      const data = await axiosInstance.get('/production-report?date=2025-04-22T18:00:00.000Z')
+      setEntries(data?.data)
+
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  useEffect(() => {
+    DailyProductionReport()
+  }, [])
 
   return (
     <div className="max-w-7xl mx-auto mt-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="">
         {/* Form Section */}
-        <div className="p-6 border rounded-md shadow">
+        <div className="p-6 rounded-md">
           <h1 className="text-2xl font-bold mb-4">Production Report Form</h1>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-4 gap-4">
+
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem className="">
+                    <FormLabel>Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="lineNo"
@@ -111,7 +184,7 @@ export default function ProductionReportForm() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {orderOptions.map((order:any) => (
+                        {orderOptions.map((order: any) => (
                           <SelectItem key={order.id} value={order.id}>
                             {order.styleNo} {/* Customize if needed */}
                           </SelectItem>
@@ -148,37 +221,50 @@ export default function ProductionReportForm() {
         </div>
 
         {/* Data Table Section */}
-        <div className="p-6 border rounded-md shadow">
-          <h1 className="text-2xl font-bold mb-4">Production Entries</h1>
+        <div className="p-6 col-span-2">
+          <h1 className="text-2xl font-bold mb-4">Daily Production Report</h1>
           <div className="overflow-x-auto">
             <table className="table-auto w-full border-collapse border border-slate-500">
               <thead className="bg-slate-200">
                 <tr>
-                  <th className="border border-slate-600 px-4 py-2">Line No</th>
-                  <th className="border border-slate-600 px-4 py-2">Production Order ID</th>
-                  <th className="border border-slate-600 px-4 py-2">Daily Production</th>
+                  <th className="border border-slate-300 text-sm px-4 py-2">Line No</th>
+                  {/* <th className="border border-slate-300 text-sm px-4 py-2">Production Order ID</th> */}
+                  <th className="border border-slate-300 text-sm px-4 py-2">Buyer</th>
+                  <th className="border border-slate-300 text-sm px-4 py-2">Style No</th>
+                  <th className="border border-slate-300 text-sm px-4 py-2">Order Qty</th>
+                  <th className="border border-slate-300 text-sm px-4 py-2">Daily Production</th>
+                  <th className="border border-slate-300 text-sm px-4 py-2">Total Price</th>
+                  <th className="border border-slate-300 text-sm px-4 py-2">Dollar</th>
+                  <th className="border border-slate-300 text-sm px-4 py-2">Total Amount</th>
                 </tr>
               </thead>
               <tbody>
-                {entries.length > 0 ? (
-                  entries.map((entry:any, index:any) => (
-                    <tr key={index}>
-                      <td className="border border-slate-600 px-4 py-2">{entry.lineNo}</td>
-                      <td className="border border-slate-600 px-4 py-2">{entry.productionOrderId}</td>
-                      <td className="border border-slate-600 px-4 py-2">{entry.dailyProduction}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={3} className="text-center border border-slate-600 px-4 py-2">
-                      No entries available.
-                    </td>
+                {entries.data?.map((entry: any, index: number) => (
+                  <tr key={index}>
+                    <td className="border border-slate-300 px-4 py-2">{entry.lineNo}</td>
+                    {/* <td className="border border-slate-300 px-4 py-2">{entry.productionOrderId}</td> */}
+                    <td className="border border-slate-300 px-4 py-2">{entry.productionOrder.buyer}</td>
+                    <td className="border border-slate-300 px-4 py-2 w-full">{entry.productionOrder.styleNo}</td>
+                    <td className="border border-slate-300 px-4 py-2">{entry.productionOrder.orderQty}</td>
+                    <td className="border border-slate-300 px-4 py-2">{entry.dailyProduction}</td>
+                    <td className="border border-slate-300 px-4 py-2">{entry.totalPrice}</td>
+                    <td className="border border-slate-300 px-4 py-2">{entry.dollar}</td>
+                    <td className="border border-slate-300 px-4 py-2">{entry.totalAmount}</td>
                   </tr>
-                )}
+                ))}
+                <tr className="font-semibold bg-slate-100">
+                  <td className="border border-slate-300 px-4 py-2 text-center" colSpan={4}>Total</td>
+                  <td className="border border-slate-300 px-4 py-2">{entries?.totals?.dailyProduction}</td>
+                  <td className="border border-slate-300 px-4 py-2">{entries?.totals?.totalPrice}</td>
+                  <td className="border border-slate-300 px-4 py-2">{entries?.totals?.dollar}</td>
+                  <td className="border border-slate-300 px-4 py-2">{entries?.totals?.totalAmount}</td>
+                </tr>
               </tbody>
             </table>
           </div>
         </div>
+
+
       </div>
     </div>
   )

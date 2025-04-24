@@ -1,50 +1,73 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 
-// GET: Fetch all production reports
-export async function GET() {
-    try {
-      const productionReports = await prisma.productionReport.findMany({
-        include: { productionOrder: true },
-      });
-  
-      // Calculate total sums
-      const totals = productionReports.reduce(
-        (acc, report) => {
-          acc.dailyProduction += report.dailyProduction;
-          acc.totalPrice += report.totalPrice;
-          acc.dollar += report.dollar;
-          acc.totalAmount += report.totalAmount;
-          return acc;
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const dateParam = searchParams.get('date');
+
+  try {
+    let whereClause = {};
+
+    if (dateParam) {
+      const inputDate = new Date(dateParam);
+      const startOfDay = new Date(inputDate.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(inputDate.setHours(23, 59, 59, 999));
+
+      whereClause = {
+        date: {
+          gte: startOfDay,
+          lte: endOfDay,
         },
-        {
-          dailyProduction: 0,
-          totalPrice: 0,
-          dollar: 0,
-          totalAmount: 0,
-        }
-      );
-  
-      // Include the totals in the response
-      const response = {
+      };
+    }
+
+    const productionReports = await prisma.productionReport.findMany({
+      where: whereClause,
+      include: { productionOrder: true },
+    });
+
+    // Calculate totals
+    const totals = productionReports.reduce(
+      (acc, report) => {
+        acc.dailyProduction += report.dailyProduction || 0;
+        acc.totalPrice += report.totalPrice || 0;
+        acc.dollar += report.dollar || 0;
+        acc.totalAmount += report.totalAmount || 0;
+        return acc;
+      },
+      {
+        dailyProduction: 0,
+        totalPrice: 0,
+        dollar: 0,
+        totalAmount: 0,
+      }
+    );
+
+    return NextResponse.json(
+      {
         data: productionReports,
         totals,
-      };
-  
-      return NextResponse.json(response, { status: 200 });
-    } catch (error) {
-      console.error("Error fetching production reports:", error);
-      return NextResponse.json({ error: "Failed to fetch production reports" }, { status: 500 });
-    }
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Error fetching production reports:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch production reports' },
+      { status: 500 }
+    );
   }
-  
+}
+
+
+
 
 // POST: Create a new production report
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const { productionOrderId, dailyProduction , lineNo} = body;
+    const { productionOrderId, dailyProduction, lineNo, date } = body;
 
     if (!productionOrderId || !dailyProduction) {
       return NextResponse.json({ error: "ProductionOrderId and dailyProduction are required" }, { status: 400 });
@@ -67,6 +90,7 @@ export async function POST(request: Request) {
     // Create ProductionReport
     const newProductionReport = await prisma.productionReport.create({
       data: {
+        date,
         lineNo,
         productionOrderId,
         dailyProduction,

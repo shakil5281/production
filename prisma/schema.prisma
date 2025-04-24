@@ -109,6 +109,7 @@ model ProductionReport {
   id                String          @id @default(auto()) @map("_id") @db.ObjectId
   productionOrder   ProductionOrder @relation(fields: [productionOrderId], references: [id])
   productionOrderId String          @db.ObjectId
+  date              DateTime?       @default(now())
   lineNo            Int
   dailyProduction   Int
   totalPrice        Float
@@ -119,8 +120,6 @@ model ProductionReport {
 
   @@index([productionOrderId])
 }
-
-
 
 model ProfitLoss {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId

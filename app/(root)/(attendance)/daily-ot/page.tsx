@@ -239,7 +239,7 @@ export default function DailyOverTime() {
                                             <TableCell className="text-center">{item.helper}</TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell className="text-left pr-4 font-semibold">Iron Input</TableCell>
+                                            <TableCell className="text-left pr-4 font-semibold">Iron / Input</TableCell>
                                             <TableCell className="text-center">{item.ironInput}</TableCell>
                                         </TableRow>
                                         <TableRow>
