@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL") // Add your MongoDB connection string in .env
 }
 
 model Attendance {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(cuid())
   workerId  String
   date      DateTime
   status    String // e.g., "Present", "Absent", etc.
@@ -16,8 +16,17 @@ model Attendance {
   updatedAt DateTime @updatedAt
 }
 
+model DailyOverTime {
+  id          String   @id @default(cuid())
+  date        DateTime
+  designation String
+  worker      Int
+  OT          Int
+  TotalOT     Int
+}
+
 model DailyExpense {
-  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  id                String   @id @default(cuid())
   date              DateTime @unique
   operatorGeneral   Int      @default(0)
   operatorOvertime  Int      @default(0)
@@ -39,7 +48,7 @@ model DailyExpense {
 }
 
 model DailyExpenseRate {
-  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  id                String   @id @default(cuid())
   date              DateTime @unique @default(now())
   operatorGeneral   Int      @default(0)
   operatorOvertime  Int      @default(0)
@@ -62,7 +71,7 @@ model DailyExpenseRate {
 
 // Manpower
 model Manpower {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(cuid())
   date      DateTime @unique @default(now())
   staff     Int      @default(0)
   operator  Int      @default(0)
@@ -81,7 +90,7 @@ model Manpower {
 // schema.prisma
 
 model ProductionOrder {
-  id               String             @id @default(auto()) @map("_id") @db.ObjectId
+  id               String             @id @default(cuid())
   programCode      String
   buyer            String
   item             String
@@ -106,9 +115,9 @@ enum OrderStatus {
 }
 
 model ProductionReport {
-  id                String          @id @default(auto()) @map("_id") @db.ObjectId
+  id                String          @id @default(cuid())
   productionOrder   ProductionOrder @relation(fields: [productionOrderId], references: [id])
-  productionOrderId String          @db.ObjectId
+  productionOrderId String
   date              DateTime?       @default(now())
   lineNo            Int
   dailyProduction   Int
@@ -122,7 +131,7 @@ model ProductionReport {
 }
 
 model ProfitLoss {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(cuid())
   date      DateTime @default(now()) // Date of the entry
   earning   Float // Total earnings for the date
   expense   Float // Total expenses for the date
@@ -132,7 +141,7 @@ model ProfitLoss {
 }
 
 model Cashbook {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String   @id @default(cuid())
   date        DateTime
   description String
   amount      Float
@@ -142,7 +151,7 @@ model Cashbook {
 }
 
 model Expense {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String   @id @default(cuid())
   date        DateTime
   category    String
   amount      Float

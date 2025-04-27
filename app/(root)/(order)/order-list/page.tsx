@@ -4,6 +4,7 @@ import axiosInstance from "@/lib/axios";
 import { useEffect, useState } from "react";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
+import FullScreenLoader from "@/components/FullScreenLoader";
 
 export default function ClientPosts() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -25,7 +26,7 @@ export default function ClientPosts() {
     fetchPosts();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <FullScreenLoader />;
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (

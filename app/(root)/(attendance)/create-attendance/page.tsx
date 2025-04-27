@@ -27,9 +27,18 @@ import { useToast } from "@/hooks/use-toast"
 
 // Define the schema
 const FormSchema = z.object({
-    date: z.date({
-        required_error: "Date is required.",
-    }),
+    date: z.preprocess((arg) => {
+        if (typeof arg === "string" || arg instanceof Date) {
+            const date = new Date(arg);
+            // সময়কে 00:00:00 করা হচ্ছে
+            date.setHours(0, 0, 0, 0);
+            return date;
+        }
+        return arg;
+    },
+        z.date({
+            required_error: "A date of birth is required.",
+        })),
     operator: z.number({ invalid_type_error: "Must be a number." }).min(0, { message: "Value must be at least 0." }),
     helper: z.number({ invalid_type_error: "Must be a number." }).min(0, { message: "Value must be at least 0." }),
     ironInput: z.number({ invalid_type_error: "Must be a number." }).min(0, { message: "Value must be at least 0." }),
@@ -46,7 +55,7 @@ export default function AttendanceFormWithCalendar() {
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            date: undefined,
+            date: new Date(),
             operator: 0,
             helper: 0,
             ironInput: 0,

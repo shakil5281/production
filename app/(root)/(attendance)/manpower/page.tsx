@@ -37,9 +37,18 @@ import { CalendarIcon } from "lucide-react";
 
 // Define schema for form validation
 const FormSchema = z.object({
-  date: z.date({
-    required_error: "A date is required.",
-  }),
+  date: z.preprocess((arg) => {
+    if (typeof arg === "string" || arg instanceof Date) {
+      const date = new Date(arg);
+      // সময়কে 00:00:00 করা হচ্ছে
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+    return arg;
+  },
+   z.date({
+    required_error: "A date of birth is required.",
+  })),
 });
 
 
