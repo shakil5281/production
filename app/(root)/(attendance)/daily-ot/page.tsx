@@ -38,6 +38,7 @@ import axiosInstance from "@/lib/axios"
 import React, { useEffect, useState } from "react"
 import DataTable from "./data-table"
 import { useToast } from "@/hooks/use-toast"
+import ManpowerTable from "./manpower-table"
 
 
 const FormSchema = z.object({
@@ -259,6 +260,9 @@ export default function InputForm() {
               <Button type="submit">Submit</Button>
             </form>
           </Form>
+        </div>
+        <div className="col-span-2">
+          <ManpowerTable overTime={overTime} />
         </div>
         <div className="col-span-2">
           <DataTable overTime={overTime} />

@@ -24,6 +24,9 @@ export async function GET(req: NextRequest) {
     const productionReports = await prisma.productionReport.findMany({
       where: whereClause,
       include: { productionOrder: true },
+      orderBy: {
+        lineNo: 'asc', // 🛠️ Sort by lineNo ascending (A to Z)
+      },
     });
 
     // Calculate totals
@@ -107,3 +110,67 @@ export async function POST(request: Request) {
   }
 }
 
+
+// PUT: Update a production report
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { id, dailyProduction, lineNo, date } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "ProductionReport id is required for update" }, { status: 400 });
+    }
+
+    const existingReport = await prisma.productionReport.findUnique({
+      where: { id },
+      include: { productionOrder: true },
+    });
+
+    if (!existingReport) {
+      return NextResponse.json({ error: "ProductionReport not found" }, { status: 404 });
+    }
+
+    // Recalculate values
+    const totalPrice = dailyProduction * existingReport.productionOrder.unitPrice;
+    const dollar = totalPrice * (existingReport.productionOrder.percentage / 100);
+    const totalAmount = dollar * 115;
+
+    const updatedReport = await prisma.productionReport.update({
+      where: { id },
+      data: {
+        date: date || existingReport.date,
+        lineNo: lineNo || existingReport.lineNo,
+        dailyProduction,
+        totalPrice,
+        dollar,
+        totalAmount,
+      },
+    });
+
+    return NextResponse.json(updatedReport, { status: 200 });
+  } catch (error) {
+    console.error("Error updating production report:", error);
+    return NextResponse.json({ error: "Failed to update production report" }, { status: 500 });
+  }
+}
+
+// DELETE: Delete a production report
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: "ProductionReport id is required for deletion" }, { status: 400 });
+    }
+
+    await prisma.productionReport.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ message: "Production report deleted successfully" }, { status: 200 });
+  } catch (error) {
+    console.error("Error deleting production report:", error);
+    return NextResponse.json({ error: "Failed to delete production report" }, { status: 500 });
+  }
+}

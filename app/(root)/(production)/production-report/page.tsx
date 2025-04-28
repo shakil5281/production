@@ -35,6 +35,8 @@ import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import axios from "axios"
 import axiosInstance from "@/lib/axios"
+import { ProductionTable } from "./data-table"
+import { ProductionTableSkeleton } from "./TableLoader"
 
 // Define the schema
 const FormSchema = z.object({
@@ -52,11 +54,13 @@ export default function ProductionReportForm() {
   const { toast } = useToast()
   const [orderOptions, setOrderOptions] = useState([])
   const [entries, setEntries] = useState<any>([])
+  const [loading, setLoading] = useState(true)
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      lineNo: 0,
+      date: new Date(),
+      lineNo: 1,
       productionOrderId: "",
       dailyProduction: 0,
     },
@@ -81,25 +85,27 @@ export default function ProductionReportForm() {
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
       await axiosInstance.post('/production-report', data)
-      DailyProductionReport()
+      DailyProductionReport(new Date().toISOString())
       form.reset()
     } catch (err) {
       console.log(err)
     }
   }
 
-  const DailyProductionReport = async () => {
+  const DailyProductionReport = async (date: any) => {
     try {
-      const data = await axiosInstance.get('/production-report?date=2025-04-22T18:00:00.000Z')
+      const data = await axiosInstance.get(`/production-report?date=${date}`)
       setEntries(data?.data)
 
     } catch (err) {
       console.log(err)
+    } finally {
+      setLoading(false)
     }
   }
 
   useEffect(() => {
-    DailyProductionReport()
+    DailyProductionReport(new Date().toISOString())
   }, [])
 
   return (
@@ -222,49 +228,14 @@ export default function ProductionReportForm() {
 
         {/* Data Table Section */}
         <div className="p-6 col-span-2">
-          <h1 className="text-2xl font-bold mb-4">Daily Production Report</h1>
-          <div className="overflow-x-auto">
-            <table className="table-auto w-full border-collapse border border-slate-500">
-              <thead className="bg-slate-200">
-                <tr>
-                  <th className="border border-slate-300 text-sm px-4 py-2">Line No</th>
-                  {/* <th className="border border-slate-300 text-sm px-4 py-2">Production Order ID</th> */}
-                  <th className="border border-slate-300 text-sm px-4 py-2">Buyer</th>
-                  <th className="border border-slate-300 text-sm px-4 py-2">Style No</th>
-                  <th className="border border-slate-300 text-sm px-4 py-2">Order Qty</th>
-                  <th className="border border-slate-300 text-sm px-4 py-2">Daily Production</th>
-                  <th className="border border-slate-300 text-sm px-4 py-2">Total Price</th>
-                  <th className="border border-slate-300 text-sm px-4 py-2">Dollar</th>
-                  <th className="border border-slate-300 text-sm px-4 py-2">Total Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {entries.data?.map((entry: any, index: number) => (
-                  <tr key={index}>
-                    <td className="border border-slate-300 px-4 py-2">{entry.lineNo}</td>
-                    {/* <td className="border border-slate-300 px-4 py-2">{entry.productionOrderId}</td> */}
-                    <td className="border border-slate-300 px-4 py-2">{entry.productionOrder.buyer}</td>
-                    <td className="border border-slate-300 px-4 py-2 w-full">{entry.productionOrder.styleNo}</td>
-                    <td className="border border-slate-300 px-4 py-2">{entry.productionOrder.orderQty}</td>
-                    <td className="border border-slate-300 px-4 py-2">{entry.dailyProduction}</td>
-                    <td className="border border-slate-300 px-4 py-2">{entry.totalPrice}</td>
-                    <td className="border border-slate-300 px-4 py-2">{entry.dollar}</td>
-                    <td className="border border-slate-300 px-4 py-2">{entry.totalAmount}</td>
-                  </tr>
-                ))}
-                <tr className="font-semibold bg-slate-100">
-                  <td className="border border-slate-300 px-4 py-2 text-center" colSpan={4}>Total</td>
-                  <td className="border border-slate-300 px-4 py-2">{entries?.totals?.dailyProduction}</td>
-                  <td className="border border-slate-300 px-4 py-2">{entries?.totals?.totalPrice}</td>
-                  <td className="border border-slate-300 px-4 py-2">{entries?.totals?.dollar}</td>
-                  <td className="border border-slate-300 px-4 py-2">{entries?.totals?.totalAmount}</td>
-                </tr>
-              </tbody>
-            </table>
+          <h1 className="text-2xl font-bold mb-4 text-center">Daily Production Report</h1>
+          <div className="">
+            {
+              loading ? <ProductionTableSkeleton /> :
+                <ProductionTable entries={entries} />
+            }
           </div>
         </div>
-
-
       </div>
     </div>
   )
