@@ -103,7 +103,7 @@ export default function ManpowerTable() {
 
 
   return (
-    <div className="grid grid-cols-2 max-w-2xl mx-auto">
+    <div className="grid lg:grid-cols-2 max-w-2xl mx-auto">
       <div className="py-4">
         <Calendar
           mode="single"

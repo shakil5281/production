@@ -28,7 +28,7 @@ import {
 export default function DashboardTabs() {
   return (
     <Tabs defaultValue="overview" className="w-full">
-      <TabsList className="grid w-[400px] grid-cols-4">
+      <TabsList className="grid md:w-[400px] grid-cols-4">
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="analyses">Analyses</TabsTrigger>
         <TabsTrigger value="reports">Reports</TabsTrigger>

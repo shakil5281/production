@@ -85,6 +85,29 @@ export const data = {
       ],
     },
     {
+      title: "Cashbook",
+      url: "#",
+      icon: SquareTerminal,
+      items: [
+        {
+          title: "Create Attendance",
+          url: "/create-attendance",
+        },
+        {
+          title: "Manpower",
+          url: "/manpower",
+        },
+        {
+          title: "Daily Over Time",
+          url: "/daily-ot",
+        },
+        {
+          title: "Daily Expense",
+          url: "/daily-expense",
+        },
+      ],
+    },
+    {
       title: "Production Order",
       url: "#",
       icon: Bot,
